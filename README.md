@@ -8,9 +8,10 @@ Bad Epoll (CVE-2026-46242) is a race-condition use-after-free in the Linux kerne
 
 Bad Epoll was reported and exploited by [Jaeyoung Chung](https://j-jaeyoung.github.io/)
 as a 0-day submission to Google [kernelCTF](https://google.github.io/security-research/kernelctf/rules.html), which rewards a Linux kernel exploit with $71,337+.
+The Bad Epoll submission received a **$92,337** reward.
 
 > [!NOTE]
-> Anthropic's AI, [Mythos](https://red.anthropic.com/2026/mythos-preview/), found [another race bug](https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=07712db80857d5d09ae08f3df85a708ecfc3b61f) in the same epoll code but missed Bad Epoll.
+> Anthropic's AI, [Mythos](https://red.anthropic.com/2026/mythos-preview/), found [another race bug](https://red.anthropic.com/2026/cvd/findings/ANT-2026-CM0TCREP) in the same epoll code but missed Bad Epoll.
 
 ---
 
@@ -41,7 +42,8 @@ The bug's race window is only about six instructions wide, and a normal attempt 
 A single [commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=58c9b016e128) in 2023 introduced two separate race conditions into the epoll code, only about 2,500 lines in all. Both turned out to be critical bugs that can lead to privilege escalation.
 
 The first was found by Anthropic's [Mythos](https://red.anthropic.com/2026/mythos-preview/)
-and reported as [CVE-2026-43074](https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=07712db80857d5d09ae08f3df85a708ecfc3b61f).
+and reported as [CVE-2026-43074](https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=07712db80857d5d09ae08f3df85a708ecfc3b61f),
+with details in Anthropic's [public report, ANT-2026-CM0TCREP](https://red.anthropic.com/2026/cvd/findings/ANT-2026-CM0TCREP).
 That result is impressive on its own, because kernel race bugs are known to be hard to find. It showed a frontier AI model's ability to find race bugs. An independent researcher later [submitted a 1-day exploit](https://github.com/2045castor/security-research/blob/submit_final/pocs/linux/kernelctf/CVE-2026-43074_lts/docs/exploit.md) for it to kernelCTF.
 
 The other race is Bad Epoll, which Mythos missed. Given that Mythos found the first bug
@@ -64,6 +66,15 @@ to find even for a frontier model, hard to fix correctly, and, as the next secti
 hard to exploit reliably. It also suggests a vulnerability research direction that
 remains worth exploring in the presence of frontier AI models: uncovering real security
 impact behind narrow timing conditions and weak evidence.
+
+> [!NOTE]
+> Independent researchers [Qi Tang](mailto:tpluszz77@gmail.com) and
+> [Junxi Qian](mailto:qjx1298677004@gmail.com) also reported CVE-2026-43074 to the Linux
+> kernel team on March 30, 2026, the same day as Anthropic.
+> Their names were inadvertently omitted from the credits for the [upstream fix](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07712db80857d5d09ae08f3df85a708ecfc3b61f).
+> Thanks to [Guidong Han](mailto:2045gemini@gmail.com) for pointing out these independent reports.
+> The three researchers later found
+> [yet another race-condition use-after-free in epoll](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8b7e8245e2293078f657521236ac92c045552e5a).
 
 ---
 
@@ -131,7 +142,8 @@ The Android exploit is still in progress.
 | 2023-04-08 | The bug was introduced into epoll (commit `58c9b016e128`). |
 | 2026-02-17 | We reported the bug to security@kernel.org. |
 | 2026-02-17 | Maintainers proposed a patch prototype, but it was not a correct fix and the discussion then stalled. |
-| 2026-04-02 | The fix for the bug Mythos found (CVE-2026-43074) landed in mainline. |
+| 2026-03-30 | CVE-2026-43074 was reported to the Linux kernel team by Anthropic and independent researchers Qi Tang and Junxi Qian. |
+| 2026-04-02 | The fix for CVE-2026-43074 landed in mainline. |
 | 2026-04-22 | We re-reported the remaining issue. |
 | 2026-04-24 | The fix for this bug landed in mainline (commit `a6dc643c6931`). |
 
